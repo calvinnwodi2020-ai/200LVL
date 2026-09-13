@@ -1,0 +1,498 @@
+/* ============================================================
+   200LVL FOOTBALL LEAGUE — visual identity
+   Pitch green + chalk lines + scoreboard gold. Oswald carries
+   the scoreboard numerals and headings; Inter carries body copy.
+   ============================================================ */
+
+:root {
+  --pitch-dark: #0f3d2e;
+  --pitch: #14513c;
+  --pitch-light: #1e6b4c;
+  --grass-line: rgba(247, 245, 239, 0.14);
+  --chalk: #f7f5ef;
+  --paper: #fbfaf6;
+  --ink: #10241c;
+  --ink-soft: #4a5f55;
+  --gold: #d9a62e;
+  --gold-deep: #b5841d;
+  --yellow-card: #eab624;
+  --red-card: #bd3b26;
+  --line: rgba(16, 36, 28, 0.12);
+  --shadow: 0 8px 24px rgba(15, 61, 46, 0.1);
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px);
+  background-size: 100% 42px;
+}
+
+h1, h2, h3, h4 {
+  font-family: "Oswald", "Arial Narrow", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 0 0 0.4em;
+  color: var(--pitch-dark);
+}
+
+h2 { font-size: 1.7rem; border-bottom: 3px solid var(--gold); display: inline-block; padding-bottom: 4px; margin-bottom: 1rem; }
+h3 { font-size: 1.2rem; }
+
+p { line-height: 1.55; }
+
+.muted { color: var(--ink-soft); }
+.small { font-size: 0.85rem; }
+.hidden { display: none !important; }
+
+/* ---------------- top bar ---------------- */
+
+.topbar {
+  background: repeating-linear-gradient(
+      135deg,
+      var(--pitch-dark),
+      var(--pitch-dark) 40px,
+      var(--pitch) 40px,
+      var(--pitch) 80px
+    );
+  color: var(--chalk);
+  padding: 1.1rem 1.5rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.topbar-inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 0 auto 1rem;
+}
+
+.brand { display: flex; align-items: center; gap: 0.6rem; }
+.brand-mark { font-size: 1.9rem; }
+.brand h1 { color: var(--chalk); font-size: 1.35rem; margin: 0; line-height: 1.1; }
+.brand-sub { margin: 0; font-size: 0.78rem; color: var(--gold); letter-spacing: 0.06em; }
+
+.topbar-info { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+
+.info-chip {
+  background: rgba(247, 245, 239, 0.1);
+  border: 1px solid rgba(217, 166, 46, 0.4);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  font-size: 0.82rem;
+}
+.info-chip .chip-label { color: var(--gold); font-size: 0.68rem; letter-spacing: 0.05em; }
+.info-chip .chip-value { color: var(--chalk); }
+.info-chip.potw { border-color: rgba(217, 166, 46, 0.7); }
+.info-chip.sync-chip { min-width: auto; }
+.sync-error { color: #ffb4a8 !important; }
+
+.tabs {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0.2rem;
+  overflow-x: auto;
+  padding-bottom: 0;
+  scrollbar-width: thin;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: rgba(247, 245, 239, 0.75);
+  font-family: "Oswald", sans-serif;
+  font-size: 0.92rem;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.tab-btn:hover { color: var(--chalk); }
+.tab-btn.active { color: var(--chalk); border-bottom-color: var(--gold); }
+.tab-btn.admin-tab { margin-left: auto; }
+
+/* ---------------- layout ---------------- */
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.tab-panel { display: none; animation: fadeIn 0.25s ease; }
+.tab-panel.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.4rem 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+@media (max-width: 800px) { .two-col { grid-template-columns: 1fr; } }
+
+/* ---------------- hero (home) ---------------- */
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 1.6rem;
+  align-items: stretch;
+}
+@media (max-width: 800px) { .hero { grid-template-columns: 1fr; } }
+
+.hero-text {
+  background: linear-gradient(160deg, var(--pitch-dark), var(--pitch-light));
+  color: var(--chalk);
+  border-radius: var(--radius);
+  padding: 2.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.8rem;
+}
+.eyebrow-plain { color: var(--gold); font-size: 0.85rem; margin: 0; }
+.hero-text h2 { color: var(--chalk); font-size: 2rem; margin: 0; }
+.hero-sub { color: rgba(247, 245, 239, 0.85); max-width: 46ch; }
+
+.hero-panel {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.4rem;
+}
+
+.mini-table { width: 100%; border-collapse: collapse; margin-top: 0.6rem; }
+.mini-table th, .mini-table td { padding: 0.4rem 0.3rem; text-align: left; font-size: 0.9rem; }
+.mini-table thead th { color: var(--ink-soft); border-bottom: 2px solid var(--line); font-weight: 600; }
+.mini-table tbody tr:nth-child(1) .team-cell { color: var(--gold-deep); font-weight: 700; }
+
+/* ---------------- stat grid ---------------- */
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+@media (max-width: 800px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.stat-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.stat-card.highlight { border-left-color: var(--pitch); background: #f2f8f4; }
+.stat-value { font-family: "Oswald", sans-serif; font-size: 1.6rem; color: var(--pitch-dark); }
+.stat-label { font-size: 0.8rem; color: var(--ink-soft); }
+
+/* ---------------- potw ---------------- */
+
+.potw-spotlight { display: flex; align-items: center; gap: 1rem; margin-top: 0.6rem; }
+.potw-badge {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: linear-gradient(160deg, var(--gold), var(--gold-deep));
+  color: var(--pitch-dark);
+  font-family: "Oswald", sans-serif;
+  font-size: 1.3rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.potw-name { margin: 0; font-weight: 700; font-family: "Oswald", sans-serif; font-size: 1.15rem; }
+.potw-meta { margin: 0.1rem 0; color: var(--ink-soft); font-size: 0.88rem; }
+.potw-note { margin: 0; font-size: 0.9rem; }
+
+/* ---------------- tables ---------------- */
+
+.table-scroll { overflow-x: auto; }
+
+.data-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; background: #fff; }
+.data-table th, .data-table td { padding: 0.65rem 0.7rem; text-align: left; border-bottom: 1px solid var(--line); font-size: 0.92rem; }
+.data-table thead th {
+  background: var(--pitch-dark);
+  color: var(--chalk);
+  font-family: "Oswald", sans-serif;
+  font-weight: 500;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  position: sticky;
+  top: 0;
+}
+.data-table tbody tr:hover { background: #f5f8f5; }
+.team-cell { font-weight: 600; }
+.pts-cell { font-weight: 700; color: var(--pitch-dark); }
+
+.tag { padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; }
+.tag.yellow { background: rgba(234, 182, 36, 0.2); color: #8a6b0e; }
+.tag.red { background: rgba(189, 59, 38, 0.15); color: var(--red-card); }
+.tag.paid { background: rgba(30, 107, 76, 0.15); color: var(--pitch); }
+.tag.unpaid { background: rgba(189, 59, 38, 0.12); color: var(--red-card); }
+
+/* ---------------- fixtures ---------------- */
+
+.round-box { margin-top: 1.6rem; }
+.round-title {
+  font-size: 1rem;
+  color: var(--pitch);
+  border-left: 4px solid var(--gold);
+  padding-left: 0.6rem;
+}
+.match-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; margin-top: 0.6rem; }
+@media (max-width: 800px) { .match-grid { grid-template-columns: 1fr; } }
+
+.match-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  box-shadow: var(--shadow);
+}
+.match-card.played { border-left: 4px solid var(--pitch); }
+
+.score-line { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
+.match-team { font-weight: 600; font-size: 0.92rem; }
+.match-team.home { text-align: right; flex: 1; }
+.match-team.away { text-align: left; flex: 1; }
+.match-score {
+  font-family: "Oswald", sans-serif;
+  font-size: 1.15rem;
+  color: var(--pitch-dark);
+  background: var(--chalk);
+  border-radius: 6px;
+  padding: 0.15rem 0.7rem;
+  min-width: 64px;
+  text-align: center;
+}
+
+.event-list { list-style: none; padding: 0; margin: 0.6rem 0 0; font-size: 0.85rem; color: var(--ink-soft); }
+.event-list li { padding: 0.15rem 0; }
+
+/* ---------------- teams ---------------- */
+
+.teams-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.5rem; }
+@media (max-width: 1000px) { .teams-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .teams-grid { grid-template-columns: 1fr; } }
+
+.team-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--pitch);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow);
+}
+.squad-list { list-style: none; padding: 0; margin: 0.6rem 0 0; }
+.squad-list li { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px dashed var(--line); font-size: 0.9rem; }
+.squad-list li:last-child { border-bottom: none; }
+
+.team-card-head { margin-bottom: 0.2rem; }
+.team-name-input {
+  font-family: "Oswald", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--pitch-dark);
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 0.15rem 0.3rem;
+  border-radius: 5px;
+  width: 100%;
+}
+.team-name-input:hover, .team-name-input:focus { border-color: var(--line); background: var(--paper); }
+
+.squad-row-admin {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0;
+}
+.squad-row-admin .squad-name-input {
+  flex: 1 1 110px;
+  min-width: 90px;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--paper);
+}
+.squad-row-admin select {
+  font-size: 0.78rem;
+  padding: 0.28rem 0.3rem;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--paper);
+  max-width: 120px;
+}
+
+.add-to-team-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.8rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--line);
+}
+.add-to-team-form input {
+  flex: 1 1 110px;
+  min-width: 90px;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+.add-to-team-form select {
+  font-size: 0.8rem;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+
+.pos-badge { font-family: "Oswald", sans-serif; font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 4px; color: #fff; }
+.pos-badge.GK { background: #6a4fb3; }
+.pos-badge.DEF { background: var(--pitch); }
+.pos-badge.MID { background: var(--gold-deep); }
+.pos-badge.FWD { background: var(--red-card); }
+
+/* ---------------- forms ---------------- */
+
+.form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.9rem; margin-top: 0.6rem; }
+@media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; } }
+
+.form-grid label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.85rem; color: var(--ink-soft); }
+.form-grid input, .form-grid select {
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+}
+.form-grid input:focus, .form-grid select:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+.checkbox-label { flex-direction: row !important; align-items: center; gap: 0.5rem !important; }
+
+.form-msg { margin-top: 0.7rem; font-size: 0.88rem; min-height: 1.2em; }
+.form-msg.success { color: var(--pitch); }
+.form-msg.error { color: var(--red-card); }
+
+/* ---------------- buttons ---------------- */
+
+.btn {
+  font-family: "Oswald", sans-serif;
+  font-size: 0.92rem;
+  border-radius: 6px;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.15s ease;
+}
+.btn:hover { opacity: 0.92; }
+.btn:active { transform: translateY(1px); }
+.btn.primary { background: var(--gold); color: var(--ink); font-weight: 600; }
+.btn.ghost { background: transparent; border: 1px solid var(--pitch); color: var(--pitch); }
+.btn.danger { background: var(--red-card); color: #fff; }
+.btn.small { font-size: 0.8rem; padding: 0.4rem 0.8rem; margin-top: 0.6rem; }
+.btn.tiny { font-size: 0.72rem; padding: 0.25rem 0.6rem; }
+
+/* ---------------- finance ---------------- */
+
+.danger-zone { border-color: rgba(189, 59, 38, 0.35); }
+
+/* ---------------- admin ---------------- */
+
+#adminLoginBox { max-width: 420px; }
+
+/* ---------------- modal ---------------- */
+
+.modal {
+  position: fixed; inset: 0;
+  background: rgba(15, 61, 46, 0.55);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+  z-index: 50;
+}
+.modal-box {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 1.6rem;
+  max-width: 560px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+.modal-close {
+  position: absolute; top: 0.8rem; right: 0.9rem;
+  background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--ink-soft);
+}
+
+.score-inputs { display: flex; align-items: center; gap: 0.8rem; margin: 1rem 0; }
+.score-inputs label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.85rem; color: var(--ink-soft); flex: 1; }
+.score-inputs input { font-size: 1.1rem; padding: 0.5rem; border: 1px solid var(--line); border-radius: 6px; width: 100%; }
+.score-sep { font-family: "Oswald", sans-serif; font-size: 1.3rem; margin-top: 1.2rem; }
+
+.event-rows { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.6rem 0; }
+.event-row { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; background: var(--paper); border-radius: 6px; padding: 0.4rem 0.5rem; }
+.event-row select { padding: 0.35rem 0.5rem; border-radius: 5px; border: 1px solid var(--line); font-size: 0.85rem; }
+.ev-label { font-size: 0.82rem; color: var(--ink-soft); }
+
+.modal-actions { margin-top: 1.2rem; text-align: right; }
+
+/* ---------------- footer ---------------- */
+
+.site-footer {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  border-top: 1px solid var(--line);
+}
+
+/* ---------------- accessibility ---------------- */
+
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
