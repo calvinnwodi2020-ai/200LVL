@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>200LVL Football League</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+
+<!-- Firebase (shared cloud storage for the league data) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCUo15qi9_jjUVBY6IZ55ahpQXqUc7aIJ8",
+    authDomain: "lvl-e8f88.firebaseapp.com",
+    projectId: "lvl-e8f88",
+    storageBucket: "lvl-e8f88.firebasestorage.app",
+    messagingSenderId: "283861541659",
+    appId: "1:283861541659:web:da7416a6cb7dccda9569be",
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  // Keep working (and queue writes) if the connection briefly drops.
+  db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+    console.warn("Offline persistence not enabled:", err.code);
+  });
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="brand-mark">⚽</span>
+      <div>
+        <h1 id="leagueNameDisplay">200LVL Football League</h1>
+        <p class="brand-sub">Matchday Central</p>
+      </div>
+    </div>
+    <div class="topbar-info">
+      <div class="info-chip" id="accountChip">
+        <span class="chip-label">Pay dues to</span>
+        <span class="chip-value" id="accountValue">—</span>
+      </div>
+      <div class="info-chip potw">
+        <span class="chip-label">★ Player of the week</span>
+        <span class="chip-value" id="potwValue">—</span>
+      </div>
+      <div class="info-chip sync-chip">
+        <span class="chip-label">Data</span>
+        <span class="chip-value" id="syncStatus">Connecting…</span>
+      </div>
+    </div>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="home">Home</button>
+    <button class="tab-btn" data-tab="table">League Table</button>
+    <button class="tab-btn" data-tab="fixtures">Fixtures &amp; Results</button>
+    <button class="tab-btn" data-tab="stats">Scorers &amp; Assists</button>
+    <button class="tab-btn" data-tab="discipline">Discipline</button>
+    <button class="tab-btn" data-tab="teams">Teams</button>
+    <button class="tab-btn" data-tab="finance">Finance</button>
+    <button class="tab-btn admin-tab" data-tab="admin">Admin</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- HOME -->
+  <section id="home" class="tab-panel active">
+    <div class="hero">
+      <div class="hero-text">
+        <p class="eyebrow-plain">Season underway</p>
+        <h2>Eight teams. One trophy. Every goal counted.</h2>
+        <p class="hero-sub">Track the table, the fixtures, the goals and the discipline of the 200LVL league — all from one page.</p>
+        <button class="btn primary" id="goToRegisterBtn">Register a player</button>
+      </div>
+      <div class="hero-panel">
+        <h3>Standings snapshot</h3>
+        <table class="mini-table">
+          <thead><tr><th>#</th><th>Team</th><th>P</th><th>Pts</th></tr></thead>
+          <tbody id="homeMiniTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <span class="stat-value" id="statPlayers">0</span>
+        <span class="stat-label">Registered players</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="statTeams">8</span>
+        <span class="stat-label">Teams</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="statPlayed">0/0</span>
+        <span class="stat-label">Matches played</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="statBalance">₦0</span>
+        <span class="stat-label">League balance</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Player of the week</h3>
+      <div class="potw-spotlight" id="potwSpotlight"></div>
+    </div>
+  </section>
+
+  <!-- LEAGUE TABLE -->
+  <section id="table" class="tab-panel">
+    <h2>League table</h2>
+    <p class="muted">Updates automatically the moment a result is entered.</p>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FIXTURES -->
+  <section id="fixtures" class="tab-panel">
+    <h2>Fixtures &amp; results</h2>
+    <p class="muted">Every team plays every other team home and away — 14 matchdays in total.</p>
+    <div id="generateFixturesWrap" class="hidden">
+      <button class="btn primary" id="generateFixturesBtn">Generate fixtures</button>
+    </div>
+    <div id="fixturesList"></div>
+  </section>
+
+  <!-- STATS -->
+  <section id="stats" class="tab-panel">
+    <h2>Scorers &amp; assists</h2>
+    <div class="two-col">
+      <div class="panel">
+        <h3>Top goal scorers</h3>
+        <table class="data-table">
+          <thead><tr><th>#</th><th>Player</th><th>Team</th><th>Goals</th></tr></thead>
+          <tbody id="scorersBody"></tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <h3>Top assisters</h3>
+        <table class="data-table">
+          <thead><tr><th>#</th><th>Player</th><th>Team</th><th>Assists</th></tr></thead>
+          <tbody id="assistersBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISCIPLINE -->
+  <section id="discipline" class="tab-panel">
+    <h2>Discipline</h2>
+    <p class="muted">Yellow cards cost ₦500, red cards cost ₦1,000. Track who has paid.</p>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead><tr id="cardsHeadRow"><th>Player</th><th>Team</th><th>Card</th><th>Fee</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody id="cardsBody"></tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h3>Removed players — fine record</h3>
+      <p class="muted">Kept so a player's fine history isn't lost if they're taken off a team.</p>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Player</th><th>Was on</th><th>Position</th><th>Fines paid</th><th>Fines owed</th><th>Reason</th><th>Date removed</th></tr></thead>
+          <tbody id="removedBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="disciplineAdminBox">
+      <h3>Record a card (admin)</h3>
+      <form id="addCardForm" class="form-grid">
+        <label>Player
+          <select id="cardPlayerSelect" required></select>
+        </label>
+        <label>Card
+          <select id="cardTypeSelect">
+            <option value="yellow">Yellow — ₦500</option>
+            <option value="red">Red — ₦1,000</option>
+          </select>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="cardPaidCheckbox" /> Fee already paid
+        </label>
+        <button class="btn primary" type="submit">Record card</button>
+      </form>
+      <p class="form-msg" id="cardMsg"></p>
+    </div>
+  </section>
+
+  <!-- TEAMS -->
+  <section id="teams" class="tab-panel">
+    <h2>Teams</h2>
+    <p class="muted">Paid players are placed on a random team that still has room for their position.</p>
+
+    <div class="panel" id="registerBox">
+      <h3>Register a player — ₦3,000 entry fee</h3>
+      <form id="registerPlayerForm" class="form-grid">
+        <label>Full name
+          <input type="text" id="newPlayerName" required placeholder="e.g. Emeka Obi" />
+        </label>
+        <label>Position
+          <select id="newPlayerPosition">
+            <option value="GK">Goalkeeper (max 1 per team)</option>
+            <option value="DEF">Defender (max 3 per team)</option>
+            <option value="MID">Midfielder (max 3 per team)</option>
+            <option value="FWD">Forward (max 3 per team)</option>
+          </select>
+        </label>
+        <button class="btn primary" type="submit">Confirm payment &amp; join a team</button>
+      </form>
+      <p class="form-msg" id="registerMsg"></p>
+    </div>
+
+    <div class="teams-grid" id="teamsGrid"></div>
+
+    <div class="panel hidden" id="teamsAdminBox">
+      <p class="muted">As admin you can edit any squad below: rename a team, edit a player's name or position, move a player to a different team, add a player straight to a specific team, or remove one. Overriding the goalkeeper/defender limits or the 10-player cap will ask you to confirm first.</p>
+    </div>
+  </section>
+
+  <!-- FINANCE -->
+  <section id="finance" class="tab-panel">
+    <h2>Finance</h2>
+    <div class="stat-grid">
+      <div class="stat-card"><span class="stat-value" id="finRegistration">₦0</span><span class="stat-label">Registration fees</span></div>
+      <div class="stat-card"><span class="stat-value" id="finDiscipline">₦0</span><span class="stat-label">Discipline fees (paid)</span></div>
+      <div class="stat-card"><span class="stat-value" id="finDisciplinePending">₦0</span><span class="stat-label">Discipline fees (pending)</span></div>
+      <div class="stat-card"><span class="stat-value" id="finIncome">₦0</span><span class="stat-label">Total income</span></div>
+      <div class="stat-card"><span class="stat-value" id="finExpenses">₦0</span><span class="stat-label">Expenses</span></div>
+      <div class="stat-card highlight"><span class="stat-value" id="finBalance">₦0</span><span class="stat-label">League balance</span></div>
+    </div>
+
+    <div class="panel">
+      <h3>Expenses log</h3>
+      <table class="data-table">
+        <thead><tr><th>Description</th><th>Amount</th><th>Date</th></tr></thead>
+        <tbody id="expensesBody"></tbody>
+      </table>
+    </div>
+
+    <div class="panel hidden" id="financeAdminBox">
+      <h3>Payment account (admin)</h3>
+      <form id="accountForm" class="form-grid">
+        <label>Bank name
+          <input type="text" id="accBankName" placeholder="e.g. GTBank" />
+        </label>
+        <label>Account name
+          <input type="text" id="accName" placeholder="e.g. 200LVL League" />
+        </label>
+        <label>Account number
+          <input type="text" id="accNumber" placeholder="e.g. 0123456789" />
+        </label>
+        <button class="btn primary" type="submit">Save account details</button>
+      </form>
+      <p class="form-msg" id="accountMsg"></p>
+
+      <h3>Log an expense (admin)</h3>
+      <form id="addExpenseForm" class="form-grid">
+        <label>Description
+          <input type="text" id="expenseDesc" placeholder="e.g. Pitch rental" required />
+        </label>
+        <label>Amount (₦)
+          <input type="number" id="expenseAmount" min="1" required />
+        </label>
+        <button class="btn primary" type="submit">Add expense</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ADMIN -->
+  <section id="admin" class="tab-panel">
+    <h2>Admin</h2>
+
+    <div class="panel" id="adminLoginBox">
+      <h3>Admin login</h3>
+      <form id="adminLoginForm" class="form-grid">
+        <label>Password
+          <input type="password" id="adminPasswordInput" required />
+        </label>
+        <button class="btn primary" type="submit">Log in</button>
+      </form>
+      <p class="form-msg" id="loginMsg"></p>
+      <p class="muted small">Default password: <code>admin123</code> — change it after logging in.</p>
+    </div>
+
+    <div class="hidden" id="adminDashboard">
+      <div class="panel">
+        <h3>Signed in as admin</h3>
+        <button class="btn ghost" id="adminLogoutBtn">Log out</button>
+      </div>
+
+      <div class="panel">
+        <h3>League name</h3>
+        <form id="leagueNameForm" class="form-grid">
+          <label>Name
+            <input type="text" id="leagueNameInput" />
+          </label>
+          <button class="btn primary" type="submit">Update</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h3>Player of the week</h3>
+        <form id="potwForm" class="form-grid">
+          <label>Player name
+            <input type="text" id="potwNameInput" placeholder="e.g. Emeka Obi" />
+          </label>
+          <label>Team
+            <input type="text" id="potwTeamInput" placeholder="e.g. Thunder FC" />
+          </label>
+          <label>Week / Matchday
+            <input type="text" id="potwWeekInput" placeholder="e.g. Matchday 5" />
+          </label>
+          <label>Note
+            <input type="text" id="potwNoteInput" placeholder="e.g. Scored a hat-trick" />
+          </label>
+          <button class="btn primary" type="submit">Save player of the week</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h3>Change admin password</h3>
+        <form id="changePasswordForm" class="form-grid">
+          <label>Current password
+            <input type="password" id="currentPasswordInput" required />
+          </label>
+          <label>New password
+            <input type="password" id="newPasswordInput" required />
+          </label>
+          <button class="btn primary" type="submit">Update password</button>
+        </form>
+        <p class="form-msg" id="passwordMsg"></p>
+      </div>
+
+      <div class="panel danger-zone">
+        <h3>Danger zone</h3>
+        <p class="muted">Wipes every team, player, fixture, card and expense. Cannot be undone.</p>
+        <button class="btn danger" id="resetLeagueBtn">Reset entire league</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>200LVL Football League — built for matchday. Data lives in this browser only.</p>
+</footer>
+
+<!-- RESULT MODAL -->
+<div class="modal hidden" id="resultModal">
+  <div class="modal-box">
+    <button class="modal-close" id="closeModalBtn">✕</button>
+    <h3 id="modalTitle">Match result</h3>
+    <form id="resultForm">
+      <div class="score-inputs">
+        <label><span id="modalHomeLabel">Home</span>
+          <input type="number" id="homeScoreInput" min="0" required />
+        </label>
+        <span class="score-sep">–</span>
+        <label><span id="modalAwayLabel">Away</span>
+          <input type="number" id="awayScoreInput" min="0" required />
+        </label>
+      </div>
+
+      <h4>Goals</h4>
+      <div id="eventRows" class="event-rows"></div>
+      <button type="button" class="btn small ghost" id="addEventRowBtn">+ Add goal</button>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn primary">Save result</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
